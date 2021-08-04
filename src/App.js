@@ -2,7 +2,7 @@ import './App.css';
 import uniqid from 'uniqid'
 import Card from './components/Card';
 import Navigation from './components/Navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import GameOver from './components/GameOver';
 
 function App() {
@@ -23,27 +23,32 @@ function App() {
   const [isGameOver, setIsGameOver] = useState(false);
   const [bestScoreList, setBestScoreList] = useState([]);
 
+  useEffect(() => {
+    if(score === 8) {
+      gameOver();
+    }
+  }, [score]);
+
   const cardClicked = (card) => {
     if(cardsClicked.includes(card)) {
-      console.log('Game over');
       gameOver();
-      return; //TODO: Game over here!
+      return;
     }
+
     setCardsClicked([...cardsClicked].concat(card))
     setScore(score + 1);
 
     setCards(
       [...cards].sort((a,b) => 0.5 - Math.random())
     )
-    
-  }
+  };
 
   const newGame = () => {
     setIsGameOver(false);
     setCards(initalCards);
     setCardsClicked([]);
     setScore(0);
-  }
+  };
 
   const gameOver = () => {
     setCards([]);
@@ -54,12 +59,12 @@ function App() {
     } else {
       setBestScoreList([...bestScoreList].concat(score));
     }
-  }
+  };
 
   return (
     <div className="App">
       <Navigation score={score} bestScoreList={bestScoreList}/>
-      {isGameOver ? <GameOver newGame={newGame}/> : null}
+      {isGameOver ? <GameOver newGame={newGame} title={score < 8 ? 'Game Over' : 'Congrats!'}/> : null}
       <div id="mainContainer">
           {
             cards.map(card =>  <Card key={card.id} title={card.title} imgSource={card.imgSource} cardClicked={cardClicked}/>)
